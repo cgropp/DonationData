@@ -6,7 +6,14 @@ import os
 while(True):
     #Use BeautifulSoup to scrape web data
     zipCode = input("Please enter a zipcode:\n")
-    URL = "https://www.opensecrets.org/donor-lookup/results?cand=&cycle=2022&employ=&jurisdiction=&name=&occupation=&page=1&state=&type=&zip=" + str(zipCode)
+    sort = input ("Type amount to sort by descending amount, or date to sort by ascending date:\n")
+    if (sort == "amount"):
+        URL = "https://www.opensecrets.org/donor-lookup/results?cand=&cycle=2022&employ=&jurisdiction=&name=&occupation=&order=desc&sort=A&state=&type=&zip=" + str(zipCode)
+    elif (sort == "date"):
+        URL = "https://www.opensecrets.org/donor-lookup/results?cand=&cycle=2022&employ=&jurisdiction=&name=&occupation=&order=asc&sort=D&state=&type=&zip=" + str(zipCode)
+    else:
+        print("Invalid selection, default sorting will be used")
+        URL = "https://www.opensecrets.org/donor-lookup/results?cand=&cycle=2022&employ=&jurisdiction=&name=&occupation=&page=1&state=&type=&zip=" + str(zipCode)
     site = requests.get(URL)
     data = site.text
     soup = BeautifulSoup(data, 'html.parser')
@@ -41,7 +48,13 @@ while(True):
 
     while(nextFound):
         page += 1
-        URL = "https://www.opensecrets.org/donor-lookup/results?cand=&cycle=2022&employ=&jurisdiction=&name=&occupation=&page=" + str(page) + "&state=&type=&zip="+ str(zipCode)
+
+        if (sort == "amount"):
+            URL = "https://www.opensecrets.org/donor-lookup/results?cand=&cycle=2022&employ=&jurisdiction=&name=&occupation=&order=desc&page=" + str(page) + "&sort=A&state=&type=&zip=" + str(zipCode)
+        elif (sort == "date"):
+            URL = "https://www.opensecrets.org/donor-lookup/results?cand=&cycle=2022&employ=&jurisdiction=&name=&occupation=&order=asc&page=" + str(page) + "&sort=D&state=&type=&zip=" + str(zipCode)
+        else:
+            URL = "https://www.opensecrets.org/donor-lookup/results?cand=&cycle=2022&employ=&jurisdiction=&name=&occupation=&page=" + str(page) + "&state=&type=&zip="+ str(zipCode)
         site = requests.get(URL)
         data = site.text
         soup = BeautifulSoup(data, 'html.parser')
@@ -82,6 +95,6 @@ while(True):
 
     print(df_short)
     currDir = os.getcwd()
-    outputFile = currDir+"\\CSV_Output\\" + zipCode + ".csv" 
+    outputFile = currDir+"\\CSV_Output\\" + zipCode + "_by_" + sort + ".csv" 
     print("File successfully saved to " + outputFile)
     df_short.to_csv(outputFile,index=False)
